@@ -68,13 +68,13 @@ class ReportOutputTest extends TestCase
     public function analyzeTaintFlowFilesForReport() : void
     {
         $vulnerable_file_contents = '<?php
- 
+
 function addPrefixToInput($prefix, $input): string {
     return $prefix . $input;
 }
 
 $prefixedData = addPrefixToInput(\'myprefix\', $_POST[\'cmd\']);
-        
+
 shell_exec($prefixedData);
 
 echo "Successfully executed the command: " . $prefixedData;';
@@ -936,7 +936,7 @@ INFO: PossiblyUndefinedGlobalVariable - somefile.php:17:6 - Possibly undefined g
 
         $checkstyle_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.junit.xml'])[0];
 
-        $xml = IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $checkstyle_report_options);
+        $xml = IssueBuffer::getOutput($checkstyle_report_options);
 
         $this->assertSame(
             '<?xml version="1.0" encoding="UTF-8"?>
@@ -999,13 +999,13 @@ column_to: 8
         );
 
         // Validate against junit xsd
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom = new DOMDocument("1.0", "UTF-8");
         $dom->preserveWhiteSpace = false;
         $dom->loadXML($xml);
 
         // Validate against xsd
-        $valid = $dom->schemaValidate(__DIR__ . '/junit.xsd');
-        $this->assertTrue($valid, 'Output did not validate against XSD');
+        $valid = $dom->schemaValidate(__DIR__ . "/junit.xsd");
+        $this->assertTrue($valid, "Output did not validate against XSD");
 
         // FIXME: The XML parser only return strings, all int value are casted, so the assertSame failed
         //$this->assertSame(
