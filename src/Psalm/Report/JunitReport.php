@@ -69,7 +69,7 @@ class JunitReport extends Report
         $suites = $dom->createElement('testsuites');
 
         $suites->setAttribute('failures', (string) $errors);
-        $suites->setAttribute('errors', '0');
+        $suites->setAttribute('errors', "0");
         $suites->setAttribute('name', 'psalm');
         $suites->setAttribute('tests', (string) $tests);
         $suites->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
@@ -87,9 +87,7 @@ class JunitReport extends Report
 
             $testcase = $dom->createElement('testcase');
             $testcase->setAttribute('name', 'psalm');
-            $testsuite->appendChild($testcase);
-
-            $suites->appendChild($testsuite);
+            $suites->appendChild($testcase);
         } else {
             foreach ($ndata as $file => $report) {
                 $this->createTestSuite($dom, $suites, $file, $report);
