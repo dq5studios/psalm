@@ -171,13 +171,15 @@ class JunitReport extends Report
 
     private function dataToOutput(IssueData $data): string
     {
-        $ret = 'message: ' . htmlspecialchars(trim($data->message), ENT_XML1 | ENT_QUOTES) . "\n";
-        $ret .= 'type: ' . trim($data->type) . "\n";
-        $ret .= 'snippet: ' . htmlspecialchars(trim($data->snippet), ENT_XML1 | ENT_QUOTES) . "\n";
-        $ret .= 'selected_text: ' . htmlspecialchars(trim($data->selected_text)) . "\n";
-        $ret .= 'line: ' . $data->line_from . "\n";
-        $ret .= 'column_from: ' . $data->column_from . "\n";
-        $ret .= 'column_to: ' . $data->column_to . "\n";
+        $ret = '';
+
+        foreach ($data as $key => $value) {
+            if (!$this->show_snippet && $key === 'snippet') {
+                continue;
+            }
+            $value = trim((string) $value);
+            $ret .= "{$key}: {$value}\n";
+        }
 
         return $ret;
     }
