@@ -941,8 +941,8 @@ INFO: PossiblyUndefinedGlobalVariable - somefile.php:17:6 - Possibly undefined g
         $this->assertSame(
             '<?xml version="1.0" encoding="UTF-8"?>
 <testsuites failures="3" errors="0" name="psalm" tests="4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/junit-team/junit5/r5.5.1/platform-tests/src/test/resources/jenkins-junit.xsd">
-  <testsuite name="somefile.php" file="somefile.php" assertions="4" failures="3" warnings="1" tests="4">
-    <testcase name="somefile.php:3" file="somefile.php" class="UndefinedVariable" classname="UndefinedVariable" line="3" assertions="1">
+  <testsuite name="somefile.php" failures="3" errors="0" tests="4">
+    <testcase name="somefile.php:3" classname="UndefinedVariable" assertions="1">
       <failure type="UndefinedVariable">message: Cannot find referenced variable $as_you
 type: UndefinedVariable
 snippet: return $as_you_____type;
@@ -952,7 +952,7 @@ column_from: 10
 column_to: 26
 </failure>
     </testcase>
-    <testcase name="somefile.php:2" file="somefile.php" class="MixedInferredReturnType" classname="MixedInferredReturnType" line="2" assertions="1">
+    <testcase name="somefile.php:2" classname="MixedInferredReturnType" assertions="1">
       <failure type="MixedInferredReturnType">message: Could not verify return type \'null|string\' for psalmCanVerify
 type: MixedInferredReturnType
 snippet: function psalmCanVerify(int $your_code): ?string {
@@ -962,7 +962,7 @@ column_from: 42
 column_to: 49
 </failure>
     </testcase>
-    <testcase name="somefile.php:7" file="somefile.php" class="UndefinedConstant" classname="UndefinedConstant" line="7" assertions="1">
+    <testcase name="somefile.php:7" classname="UndefinedConstant" assertions="1">
       <failure type="UndefinedConstant">message: Const CHANGE_ME is not defined
 type: UndefinedConstant
 snippet: echo CHANGE_ME;
@@ -972,7 +972,7 @@ column_from: 6
 column_to: 15
 </failure>
     </testcase>
-    <testcase name="somefile.php:15" file="somefile.php" class="PossiblyUndefinedGlobalVariable" classname="PossiblyUndefinedGlobalVariable" line="15" assertions="1">
+    <testcase name="somefile.php:15" classname="PossiblyUndefinedGlobalVariable" assertions="1">
       <failure type="PossiblyUndefinedGlobalVariable">message: Possibly undefined global variable $a, first seen on line 10
 type: PossiblyUndefinedGlobalVariable
 snippet: echo $a

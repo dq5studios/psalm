@@ -69,7 +69,7 @@ class JunitReport extends Report
         $suites = $dom->createElement('testsuites');
 
         $suites->setAttribute('failures', (string) $errors);
-        $suites->setAttribute('errors', "0");
+        $suites->setAttribute('errors', '0');
         $suites->setAttribute('name', 'psalm');
         $suites->setAttribute('tests', (string) $tests);
         $suites->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
@@ -115,16 +115,16 @@ class JunitReport extends Report
 
         $testsuite = $dom->createElement('testsuite');
         $testsuite->setAttribute('name', $file);
+        // $testsuite->setAttribute('tests', (string) $totalTests);
         $testsuite->setAttribute('failures', (string) $report['errors']);
         $testsuite->setAttribute('errors', '0');
-        $testsuite->setAttribute('tests', (string) $totalTests);
 
         $failuresByType = $this->groupByType($report['failures']);
 
         foreach ($failuresByType as $type => $data) {
             foreach ($data as $d) {
                 $testcase = $dom->createElement('testcase');
-                $testcase->setAttribute('name', "{$file}:{$d->line_from}");
+                $testcase->setAttribute('name', "{$file}:{$d['line']}");
                 $testcase->setAttribute('classname', $type);
                 $testcase->setAttribute('assertions', (string) count($data));
 
