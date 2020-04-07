@@ -382,9 +382,8 @@ class ProjectAnalyzer
                 $format = $report_format[$i];
             } else {
                 foreach ($mapping as $extension => $type) {
-                    if (substr($report_file_path, -strlen($extension)) === $extension) {
+                    if (substr($report_file_path, -strlen($extension)) === $extension && is_null($format)) {
                         $format = $type;
-                        continue;
                     }
                 }
             }
