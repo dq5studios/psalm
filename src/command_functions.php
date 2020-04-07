@@ -392,6 +392,10 @@ Reports:
     --report-show-info[=BOOLEAN]
         Whether the report should include non-errors in its output (defaults to true)
 
+    --report-output-format=FORMAT
+        Changes the output format.
+        Available formats: emacs, json, pylint, xml, checkstyle, junit, sonarqube, github
+
 Caching:
     --clear-cache
         Clears all cache files that Psalm uses for this specific project

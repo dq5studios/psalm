@@ -101,6 +101,7 @@ $valid_long_options = [
     'plugin:',
     'report:',
     'report-show-info:',
+    'report-output-format:',
     'root:',
     'set-baseline:',
     'show-info:',
@@ -593,20 +594,20 @@ $stdout_report_options->format = $output_format;
 $stdout_report_options->show_snippet = !isset($options['show-snippet']) || $options['show-snippet'] !== "false";
 $stdout_report_options->pretty = isset($options['pretty-print']) && $options['pretty-print'] !== "false";
 
-/** @var list<string>|string $report_file_paths type guaranteed by argument to getopt() */
-$report_file_paths = $options['report'] ?? [];
-if (is_string($report_file_paths)) {
-    $report_file_paths = [$report_file_paths];
-}
+$report_output_format = isset($options['report-output-format']) && is_string($options['report-output-format'])
+    ? explode(',', $options['report-output-format'])
+    : [];
+
 $project_analyzer = new ProjectAnalyzer(
     $config,
     $providers,
     $stdout_report_options,
     ProjectAnalyzer::getFileReportOptions(
-        $report_file_paths,
+        isset($options['report']) && is_string($options['report']) ? explode(',', $options['report']) : [],
         isset($options['report-show-info'])
             ? $options['report-show-info'] !== 'false' && $options['report-show-info'] !== '0'
-            : true
+            : true,
+        $report_output_format
     ),
     $threads,
     $progress

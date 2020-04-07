@@ -351,9 +351,11 @@ class ProjectAnalyzer
 
     /**
      * @param  array<string>  $report_file_paths
-     * @return list<ReportOptions>
+     * @param  bool   $show_info
+     * @param  array<string> $report_format
+     * @return array<ReportOptions>
      */
-    public static function getFileReportOptions(array $report_file_paths, bool $show_info = true): array
+    public static function getFileReportOptions(array $report_file_paths, bool $show_info = true, array $report_format = [])
     {
         $report_options = [];
 
@@ -371,7 +373,16 @@ class ProjectAnalyzer
             '.sarif' => Report::TYPE_SARIF,
         ];
 
-        foreach ($report_file_paths as $report_file_path) {
+        foreach ($report_file_paths as $i => $report_file_path) {
+            if (isset($report_format[$i]) && in_array($report_format[$i], $mapping, true)) {
+                $o = new ReportOptions();
+
+                $o->format = $report_format[$i];
+                $o->show_info = $show_info;
+                $o->output_path = $report_file_path;
+                $report_options[] = $o;
+                continue;
+            }
             foreach ($mapping as $extension => $type) {
                 if (substr($report_file_path, -strlen($extension)) === $extension) {
                     $o = new ReportOptions();
