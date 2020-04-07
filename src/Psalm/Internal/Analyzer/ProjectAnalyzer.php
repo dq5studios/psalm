@@ -86,9 +86,8 @@ use function file_get_contents;
 use function substr_count;
 use function array_map;
 use function end;
-use Psalm\Internal\Codebase\TaintFlowGraph;
-use function ini_get;
 use function in_array;
+use Psalm\Internal\Codebase\Taint;
 
 /**
  * @internal
@@ -355,8 +354,11 @@ class ProjectAnalyzer
      * @param  array<string> $report_format
      * @return array<ReportOptions>
      */
-    public static function getFileReportOptions(array $report_file_paths, bool $show_info = true, array $report_format = [])
-    {
+    public static function getFileReportOptions(
+        array $report_file_paths,
+        bool $show_info = true,
+        array $report_format = []
+    ) {
         $report_options = [];
 
         $mapping = [
