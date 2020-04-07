@@ -82,6 +82,7 @@ use function filter_var;
 use const FILTER_VALIDATE_INT;
 use function is_int;
 use function is_readable;
+use function is_null;
 use function file_get_contents;
 use function substr_count;
 use function array_map;
