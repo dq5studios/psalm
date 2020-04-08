@@ -759,13 +759,8 @@ class IssueBuffer
                 $output = new GithubActionsReport($normalized_data, self::$fixable_issue_counts, $report_options);
                 break;
 
-            case Report::TYPE_PHP_STORM:
-                $output = new PhpStormReport($normalized_data, self::$fixable_issue_counts, $report_options);
-                break;
-
-            case Report::TYPE_SARIF:
-                $output = new SarifReport($normalized_data, self::$fixable_issue_counts, $report_options);
-                break;
+            default:
+                throw new \UnexpectedValueException('Unknown report format ' . $report_options->format);
         }
 
         return $output->create();
