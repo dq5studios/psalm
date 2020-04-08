@@ -1,6 +1,9 @@
 <?php
 
-namespace Psalm;
+use Composer\Autoload\ClassLoader;
+use Psalm\Config;
+use Psalm\Exception\ConfigException;
+use Psalm\Report;
 
 use Composer\Autoload\ClassLoader;
 use Phar;
@@ -297,6 +300,8 @@ function getPathsToCheck($f_paths): ?array
  */
 function getPsalmHelpText(): string
 {
+    $output_format = join(', ', Report::SUPPORTED_OUTPUT_TYPES);
+
     return <<<HELP
 Usage:
     psalm [options] [file...]
@@ -371,8 +376,7 @@ Output:
 
     --output-format=console
         Changes the output format.
-        Available formats: compact, console, text, emacs, json, pylint, xml, checkstyle, junit, sonarqube, github,
-                           phpstorm
+        Available formats: {$output_format}
 
     --no-progress
         Disable the progress indicator
@@ -394,7 +398,7 @@ Reports:
 
     --report-output-format=FORMAT
         Changes the output format.
-        Available formats: emacs, json, pylint, xml, checkstyle, junit, sonarqube, github
+        Available formats: {$output_format}
 
 Caching:
     --clear-cache
