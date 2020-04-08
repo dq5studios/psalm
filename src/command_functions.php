@@ -300,7 +300,7 @@ function getPathsToCheck($f_paths): ?array
  */
 function getPsalmHelpText(): string
 {
-    $output_format = join(', ', Report::SUPPORTED_OUTPUT_TYPES);
+    $supported_formats = join(', ', Report::SUPPORTED_OUTPUT_TYPES);
 
     return <<<HELP
 Usage:
@@ -376,7 +376,7 @@ Output:
 
     --output-format=console
         Changes the output format.
-        Available formats: {$output_format}
+        Available formats: {$supported_formats}
 
     --no-progress
         Disable the progress indicator
@@ -398,7 +398,7 @@ Reports:
 
     --report-output-format=FORMAT
         Changes the output format.
-        Available formats: {$output_format}
+        Available formats: {$supported_formats}
 
 Caching:
     --clear-cache
