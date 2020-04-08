@@ -378,7 +378,7 @@ class ProjectAnalyzer
 
         foreach ($report_file_paths as $i => $report_file_path) {
             $format = null;
-            if (isset($report_format[$i]) && in_array($report_format[$i], $mapping, true)) {
+            if (isset($report_format[$i]) && in_array($report_format[$i], Report::SUPPORTED_OUTPUT_TYPES, true)) {
                 $format = $report_format[$i];
             } else {
                 foreach ($mapping as $extension => $type) {
