@@ -229,18 +229,6 @@ if (isset($options['c']) && is_array($options['c'])) {
 }
 
 
-if (array_key_exists('h', $options)) {
-    echo getPsalmHelpText();
-    /*
-    --shepherd[=host]
-        Send data to Shepherd, Psalm's GitHub integration tool.
-        `host` is the location of the Shepherd server. It defaults to shepherd.dev
-        More information is available at https://psalm.dev/shepherd
-    */
-
-    exit;
-}
-
 if (getcwd() === false) {
     fwrite(STDERR, 'Cannot get current working directory' . PHP_EOL);
     exit(1);
@@ -279,6 +267,18 @@ $first_autoloader = $include_collector->runAndCollect(
     }
 );
 
+
+if (array_key_exists('h', $options)) {
+    echo getPsalmHelpText();
+    /*
+    --shepherd[=host]
+        Send data to Shepherd, Psalm's GitHub integration tool.
+        `host` is the location of the Shepherd server. It defaults to shepherd.dev
+        More information is available at https://psalm.dev/shepherd
+    */
+
+    exit;
+}
 
 if (array_key_exists('v', $options)) {
     echo 'Psalm ' . PSALM_VERSION . PHP_EOL;
