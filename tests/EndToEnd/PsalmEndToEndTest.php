@@ -72,10 +72,7 @@ class PsalmEndToEndTest extends TestCase
 
     public function tearDown(): void
     {
-        if (\file_exists(self::$tmpDir . '/cache')) {
-            self::recursiveRemoveDirectory(self::$tmpDir . '/cache');
-        }
-        parent::tearDown();
+        $this->assertStringContainsString('Usage:', $this->runPsalm(['--help'], self::$tmpDir, false, false)['STDOUT']);
     }
 
     public function testHelpReturnsMessage(): void
