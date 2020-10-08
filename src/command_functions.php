@@ -389,9 +389,8 @@ Output:
 
 Reports:
     --report=PATH
-        The path where to output report file. The output format is based on the file extension.
-        (Currently supported formats: ".json", ".xml", ".txt", ".emacs", ".pylint", ".console",
-        ".sarif", "checkstyle.xml", "sonarqube.json", "summary.json", "junit.xml")
+        The path where to output report file.
+        Available formats: {$supported_formats}
 
     --report-show-info[=BOOLEAN]
         Whether the report should include non-errors in its output (defaults to true)
