@@ -359,7 +359,7 @@ class ProjectAnalyzer
         array $report_file_paths,
         bool $show_info = true,
         array $report_format = []
-    ) {
+    ): array {
         $report_options = [];
 
         $mapping = [
