@@ -163,6 +163,12 @@ Options:
     --enable-autocomplete[=BOOL]
         Enables or disables autocomplete on methods and properties. Default is true.
 
+    --use-extended-diagnostic-codes
+        Enables sending help uri links with the code in diagnostic messages.
+
+    --verbose
+        Will send log messages to the client with information.
+
 HELP;
 
     exit;
