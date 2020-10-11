@@ -390,13 +390,13 @@ Output:
 Reports:
     --report=PATH
         The path where to output report file.
-        Available formats: {$supported_formats}
+        If --report-output-format is not used, format is determined from filename.
 
     --report-show-info[=BOOLEAN]
         Whether the report should include non-errors in its output (defaults to true)
 
     --report-output-format=FORMAT
-        Changes the output format.
+        Changes the report format.
         Available formats: {$supported_formats}
 
 Caching:
