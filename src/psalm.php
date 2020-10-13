@@ -605,8 +605,6 @@ if (isset($options['report-output-format'])) {
     $report_output_format = $options['report-output-format'];
     if (is_string($report_output_format)) {
         $report_output_format = explode(',', $report_output_format);
-    } elseif (is_array($report_output_format)) {
-        $report_output_format = $report_output_format;
     }
 } else {
     $report_output_format = [];
