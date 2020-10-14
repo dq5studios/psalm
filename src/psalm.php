@@ -24,6 +24,7 @@ use Psalm\Progress\VoidProgress;
 use function array_slice;
 use function getopt;
 use function implode;
+use function explode;
 use function is_scalar;
 use function array_map;
 use function substr;

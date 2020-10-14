@@ -300,7 +300,7 @@ function getPathsToCheck($f_paths): ?array
  */
 function getPsalmHelpText(): string
 {
-    $supported_formats = join(', ', Report::SUPPORTED_OUTPUT_TYPES);
+    $supported_formats = implode(', ', Report::SUPPORTED_OUTPUT_TYPES);
 
     return <<<HELP
 Usage:
