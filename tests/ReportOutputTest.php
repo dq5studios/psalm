@@ -68,13 +68,13 @@ class ReportOutputTest extends TestCase
     public function analyzeTaintFlowFilesForReport() : void
     {
         $vulnerable_file_contents = '<?php
- 
+
 function addPrefixToInput($prefix, $input): string {
     return $prefix . $input;
 }
 
 $prefixedData = addPrefixToInput(\'myprefix\', $_POST[\'cmd\']);
-        
+
 shell_exec($prefixedData);
 
 echo "Successfully executed the command: " . $prefixedData;';
@@ -472,6 +472,13 @@ echo "Successfully executed the command: " . $prefixedData;';
             $issue_data,
             json_decode(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $sarif_report_options), true)
         );
+
+        $sarif_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_SARIF])[0];
+
+        $this->assertSame(
+            $issue_data,
+            json_decode(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $sarif_report_options), true)
+        );
     }
 
     public function analyzeFileForReport() : void
@@ -620,6 +627,13 @@ echo $a;';
             array_values($issue_data),
             json_decode(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $json_report_options), true)
         );
+
+        $json_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_JSON])[0];
+
+        $this->assertSame(
+            array_values($issue_data),
+            json_decode(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $json_report_options), true)
+        );
     }
 
     public function testFilteredJsonReportIsStillArray(): void
@@ -751,21 +765,38 @@ echo $a;';
             $issue_data,
             json_decode(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $sonarqube_report_options), true)
         );
+
+        $sonarqube_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_SONARQUBE])[0];
+        $sonarqube_report_options->format = 'sonarqube';
+
+        $this->assertSame(
+            $issue_data,
+            json_decode(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $sonarqube_report_options), true)
+        );
     }
 
     public function testEmacsReport(): void
     {
         $this->analyzeFileForReport();
 
-        $emacs_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.emacs'])[0];
-
-        $this->assertSame(
-            'somefile.php:3:10:error - Cannot find referenced variable $as_you_____type
+        $issue_data = 'somefile.php:3:10:error - Cannot find referenced variable $as_you_____type
 somefile.php:3:10:error - Could not infer a return type
 somefile.php:2:42:error - Could not verify return type \'null|string\' for psalmCanVerify
 somefile.php:8:6:error - Const CHANGE_ME is not defined
 somefile.php:17:6:warning - Possibly undefined global variable $a, first seen on line 11
-',
+';
+
+        $emacs_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.emacs'])[0];
+
+        $this->assertSame(
+            $issue_data,
+            IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $emacs_report_options)
+        );
+
+        $emacs_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_EMACS])[0];
+
+        $this->assertSame(
+            $issue_data,
             IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $emacs_report_options)
         );
     }
@@ -774,15 +805,24 @@ somefile.php:17:6:warning - Possibly undefined global variable $a, first seen on
     {
         $this->analyzeFileForReport();
 
-        $pylint_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.pylint'])[0];
-
-        $this->assertSame(
-            'somefile.php:3: [E0001] UndefinedVariable: Cannot find referenced variable $as_you_____type (column 10)
+        $issue_data = 'somefile.php:3: [E0001] UndefinedVariable: Cannot find referenced variable $as_you_____type (column 10)
 somefile.php:3: [E0001] MixedReturnStatement: Could not infer a return type (column 10)
 somefile.php:2: [E0001] MixedInferredReturnType: Could not verify return type \'null|string\' for psalmCanVerify (column 42)
 somefile.php:8: [E0001] UndefinedConstant: Const CHANGE_ME is not defined (column 6)
 somefile.php:17: [W0001] PossiblyUndefinedGlobalVariable: Possibly undefined global variable $a, first seen on line 11 (column 6)
-',
+';
+
+        $pylint_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.pylint'])[0];
+
+        $this->assertSame(
+            $issue_data,
+            IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $pylint_report_options)
+        );
+
+        $pylint_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_PYLINT])[0];
+
+        $this->assertSame(
+            $issue_data,
             IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $pylint_report_options)
         );
     }
@@ -791,11 +831,7 @@ somefile.php:17: [W0001] PossiblyUndefinedGlobalVariable: Possibly undefined glo
     {
         $this->analyzeFileForReport();
 
-        $console_report_options = new Report\ReportOptions();
-        $console_report_options->use_color = false;
-
-        $this->assertSame(
-            'ERROR: UndefinedVariable - somefile.php:3:10 - Cannot find referenced variable $as_you_____type (see https://psalm.dev/024)
+        $issue_data = 'ERROR: UndefinedVariable - somefile.php:3:10 - Cannot find referenced variable $as_you_____type (see https://psalm.dev/024)
   return $as_you_____type;
 
 ERROR: MixedReturnStatement - somefile.php:3:10 - Could not infer a return type (see https://psalm.dev/138)
@@ -810,7 +846,29 @@ echo CHANGE_ME;
 INFO: PossiblyUndefinedGlobalVariable - somefile.php:17:6 - Possibly undefined global variable $a, first seen on line 11 (see https://psalm.dev/126)
 echo $a
 
-',
+';
+
+        $console_report_options = new Report\ReportOptions();
+        $console_report_options->use_color = false;
+
+        $this->assertSame(
+            $issue_data,
+            IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $console_report_options)
+        );
+
+        $console_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.console'])[0];
+        $console_report_options->use_color = false;
+
+        $this->assertSame(
+            $issue_data,
+            IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $console_report_options)
+        );
+
+        $console_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_CONSOLE])[0];
+        $console_report_options->use_color = false;
+
+        $this->assertSame(
+            $issue_data,
             IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $console_report_options)
         );
     }
@@ -874,23 +932,33 @@ INFO: PossiblyUndefinedGlobalVariable - somefile.php:17:6 - Possibly undefined g
     {
         $this->analyzeFileForReport();
 
+        $issue_data = 'FILE: somefile.php' . "\n" .
+        "\n" .
+        '+----------+------+---------------------------------+---------------------------------------------------------------+' . "\n" .
+        '| SEVERITY | LINE | ISSUE                           | DESCRIPTION                                                   |' . "\n" .
+        '+----------+------+---------------------------------+---------------------------------------------------------------+' . "\n" .
+        '| ERROR    | 3    | UndefinedVariable               | Cannot find referenced variable $as_you_____type              |' . "\n" .
+        '| ERROR    | 3    | MixedReturnStatement            | Could not infer a return type                                 |' . "\n" .
+        '| ERROR    | 2    | MixedInferredReturnType         | Could not verify return type \'null|string\' for psalmCanVerify |' . "\n" .
+        '| ERROR    | 8    | UndefinedConstant               | Const CHANGE_ME is not defined                                |' . "\n" .
+        '| INFO     | 17   | PossiblyUndefinedGlobalVariable | Possibly undefined global variable $a, first seen on line 11  |' . "\n" .
+        '+----------+------+---------------------------------+---------------------------------------------------------------+' . "\n";
+
         $compact_report_options = new Report\ReportOptions();
         $compact_report_options->format = Report::TYPE_COMPACT;
         $compact_report_options->use_color = false;
 
         $this->assertSame(
-            'FILE: somefile.php' . "\n" .
-            "\n" .
-            '+----------+------+---------------------------------+---------------------------------------------------------------+' . "\n" .
-            '| SEVERITY | LINE | ISSUE                           | DESCRIPTION                                                   |' . "\n" .
-            '+----------+------+---------------------------------+---------------------------------------------------------------+' . "\n" .
-            '| ERROR    | 3    | UndefinedVariable               | Cannot find referenced variable $as_you_____type              |' . "\n" .
-            '| ERROR    | 3    | MixedReturnStatement            | Could not infer a return type                                 |' . "\n" .
-            '| ERROR    | 2    | MixedInferredReturnType         | Could not verify return type \'null|string\' for psalmCanVerify |' . "\n" .
-            '| ERROR    | 8    | UndefinedConstant               | Const CHANGE_ME is not defined                                |' . "\n" .
-            '| INFO     | 17   | PossiblyUndefinedGlobalVariable | Possibly undefined global variable $a, first seen on line 11  |' . "\n" .
-            '+----------+------+---------------------------------+---------------------------------------------------------------+' . "\n",
+            $issue_data,
             $this->toUnixLineEndings(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $compact_report_options))
+        );
+
+        $console_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_COMPACT])[0];
+        $console_report_options->use_color = false;
+
+        $this->assertSame(
+            $issue_data,
+            IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $console_report_options)
         );
     }
 
@@ -898,10 +966,7 @@ INFO: PossiblyUndefinedGlobalVariable - somefile.php:17:6 - Possibly undefined g
     {
         $this->analyzeFileForReport();
 
-        $checkstyle_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.checkstyle.xml'])[0];
-
-        $this->assertSame(
-            '<?xml version="1.0" encoding="UTF-8"?>
+        $issue_data = '<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle>
 <file name="somefile.php">
  <error line="3" column="10" severity="error" message="UndefinedVariable: Cannot find referenced variable $as_you_____type"/>
@@ -919,7 +984,19 @@ INFO: PossiblyUndefinedGlobalVariable - somefile.php:17:6 - Possibly undefined g
  <error line="17" column="6" severity="info" message="PossiblyUndefinedGlobalVariable: Possibly undefined global variable $a, first seen on line 11"/>
 </file>
 </checkstyle>
-',
+';
+
+        $checkstyle_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.checkstyle.xml'])[0];
+
+        $this->assertSame(
+            $issue_data,
+            IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $checkstyle_report_options)
+        );
+
+        $checkstyle_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_CHECKSTYLE])[0];
+
+        $this->assertSame(
+            $issue_data,
             IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $checkstyle_report_options)
         );
 
@@ -934,12 +1011,7 @@ INFO: PossiblyUndefinedGlobalVariable - somefile.php:17:6 - Possibly undefined g
     {
         $this->analyzeFileForReport();
 
-        $checkstyle_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.junit.xml'])[0];
-
-        $xml = IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $checkstyle_report_options);
-
-        $this->assertSame(
-            '<?xml version="1.0" encoding="UTF-8"?>
+        $issue_data = '<?xml version="1.0" encoding="UTF-8"?>
 <testsuites failures="4" errors="0" name="psalm" tests="5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/junit-team/junit5/r5.5.1/platform-tests/src/test/resources/jenkins-junit.xsd">
   <testsuite name="somefile.php" failures="4" errors="0" tests="5">
     <testcase name="somefile.php:3" classname="UndefinedVariable" assertions="1">
@@ -994,7 +1066,32 @@ column_to: 8
     </testcase>
   </testsuite>
 </testsuites>
-',
+';
+
+        $checkstyle_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.junit.xml'])[0];
+
+        $xml = IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $checkstyle_report_options);
+
+        $this->assertSame(
+            $issue_data,
+            $xml
+        );
+
+        // Validate against junit xsd
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->preserveWhiteSpace = false;
+        $dom->loadXML($xml);
+
+        // Validate against xsd
+        $valid = $dom->schemaValidate(__DIR__ . '/junit.xsd');
+        $this->assertTrue($valid, 'Output did not validate against XSD');
+
+        $checkstyle_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.log'], [Report::TYPE_JUNIT])[0];
+
+        $xml = IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $checkstyle_report_options);
+
+        $this->assertSame(
+            $issue_data,
             $xml
         );
 

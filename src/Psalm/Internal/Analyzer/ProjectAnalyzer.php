@@ -89,6 +89,7 @@ use function end;
 use Psalm\Internal\Codebase\TaintFlowGraph;
 use function ini_get;
 use function in_array;
+use function is_null;
 
 /**
  * @internal
@@ -350,11 +351,16 @@ class ProjectAnalyzer
     }
 
     /**
-     * @param  array<string>  $report_file_paths
+     * @param  array<string> $report_file_paths
+     * @param  array<string> $report_output_formats
+     * @param  bool          $show_info
      * @return list<ReportOptions>
      */
-    public static function getFileReportOptions(array $report_file_paths, bool $show_info = true): array
-    {
+    public static function getFileReportOptions(
+        array $report_file_paths,
+        array $report_output_formats = [],
+        bool $show_info = true
+    ): array {
         $report_options = [];
 
         $mapping = [
@@ -371,18 +377,29 @@ class ProjectAnalyzer
             '.sarif' => Report::TYPE_SARIF,
         ];
 
-        foreach ($report_file_paths as $report_file_path) {
-            foreach ($mapping as $extension => $type) {
-                if (substr($report_file_path, -strlen($extension)) === $extension) {
-                    $o = new ReportOptions();
-
-                    $o->format = $type;
-                    $o->show_info = $show_info;
-                    $o->output_path = $report_file_path;
-                    $o->use_color = false;
-                    $report_options[] = $o;
-                    continue 2;
+        foreach ($report_file_paths as $key => $report_file_path) {
+            $format = null;
+            if (isset($report_output_formats[$key])
+                && in_array($report_output_formats[$key], Report::SUPPORTED_OUTPUT_TYPES, true)
+            ) {
+                $format = $report_output_formats[$key];
+            } else {
+                foreach ($mapping as $extension => $type) {
+                    if (substr($report_file_path, -strlen($extension)) === $extension && is_null($format)) {
+                        $format = $type;
+                    }
                 }
+            }
+
+            if (!is_null($format)) {
+                $o = new ReportOptions();
+
+                $o->format = $format;
+                $o->show_info = $show_info;
+                $o->output_path = $report_file_path;
+                $o->use_color = false;
+                $report_options[] = $o;
+                continue;
             }
 
             throw new \UnexpectedValueException('Unknown report format ' . $report_file_path);
